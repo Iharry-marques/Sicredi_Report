@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>REPORT SICREDI - DASHBOARD</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Botão de Ajuda -->
+    <button class="help-btn" onclick="showHelpModal()" title="Ajuda - Como usar o sistema" aria-label="Abrir ajuda">
+      ❓ Ajuda
+    </button>
+    
+    <h1>REPORT SICREDI - DASHBOARD</h1>
+    <div class="dashboard-container">
+      <div class="text-boxes">
+        <div class="text-editor">
+          <h2>
+            <span>📊 Análise</span>
+            <div class="template-controls">
+              <button class="template-btn" onclick="saveTemplate('analise')" title="Salvar como template">💾</button>
+              <button class="template-btn" onclick="loadTemplate('analise')" title="Carregar template">📁</button>
+            </div>
+          </h2>
+          <div class="editor" contenteditable="true" id="analise" aria-label="Campo de análise"></div>
+        </div>
+        <div class="text-editor">
+          <h2>
+            <span>⚠️ Pontos críticos</span>
+            <div class="template-controls">
+              <button class="template-btn" onclick="saveTemplate('criticos')" title="Salvar como template">💾</button>
+              <button class="template-btn" onclick="loadTemplate('criticos')" title="Carregar template">📁</button>
+            </div>
+          </h2>
+          <div class="editor" contenteditable="true" id="criticos" aria-label="Campo de pontos críticos"></div>
+        </div>
+        <div class="text-editor">
+          <h2>
+            <span>📝 Resumo</span>
+            <div class="template-controls">
+              <button class="template-btn" onclick="saveTemplate('resumo')" title="Salvar como template">💾</button>
+              <button class="template-btn" onclick="loadTemplate('resumo')" title="Carregar template">📁</button>
+            </div>
+          </h2>
+          <div class="editor" contenteditable="true" id="resumo" aria-label="Campo de resumo executivo"></div>
+        </div>
+      </div>
+      
+      <!-- Carrossel de Dashboards -->
+      <div class="carousel-container">
+        <div class="carousel-header">
+          <h3>📊 Dashboards Disponíveis</h3>
+          <div class="carousel-controls">
+            <button class="carousel-btn prev-btn" onclick="previousImage()" aria-label="Dashboard anterior">❮</button>
+            <span class="carousel-counter" aria-live="polite">
+              <span id="currentIndex">1</span> / <span id="totalImages">1</span>
+            </span>
+            <button class="carousel-btn next-btn" onclick="nextImage()" aria-label="Próximo dashboard">❯</button>
+          </div>
+        </div>
+        
+        <div class="carousel-wrapper">
+          <div class="carousel-track" id="carouselTrack" role="region" aria-label="Carrossel de dashboards">
+            <div class="carousel-slide active">
+              <img src="image.png" alt="Dashboard 1" data-title="Dashboard Principal">
+              <button class="zoom-btn" onclick="zoomImage(this.previousElementSibling)" title="Visualizar em tela cheia" aria-label="Ampliar imagem">🔍</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="carousel-footer">
+          <div class="carousel-title" id="carouselTitle" onclick="editTitle(this)" title="Clique para editar o título" tabindex="0" role="button" aria-label="Título do dashboard (clique para editar)">Dashboard Principal</div>
+          <div class="carousel-actions">
+            <button class="action-btn" onclick="addNewDashboard()" aria-label="Adicionar novo dashboard">➕ Adicionar Dashboard</button>
+            <button class="action-btn remove-btn" onclick="confirmRemoveDashboard()" id="removeBtn" style="display: none;" aria-label="Remover dashboard atual">🗑️ Remover</button>
+          </div>
+        </div>
+        
+        <!-- Indicadores de página -->
+        <div class="carousel-indicators" id="carouselIndicators" role="tablist" aria-label="Indicadores de dashboard">
+          <span class="indicator active" onclick="goToSlide(0)" role="tab" aria-selected="true" aria-label="Dashboard 1" tabindex="0"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload de imagem (oculto) -->
+    <input type="file" id="imageUpload" accept="image/*" multiple style="display: none;" onchange="handleImageUpload(event)" aria-label="Selecionar imagens">
+
+    <!-- Exibição do relatório formatado -->
+    <div id="saida" class="saida" role="region" aria-label="Visualização do relatório"></div>
+
+    <div class="pdf-controls">
+      <button onclick="showPDFOptions()" aria-label="Configurar e baixar relatório em PDF">📄 Baixar PDF</button>
+      <button onclick="scrollToReport()" style="background: linear-gradient(135deg, #17a2b8, #138496);" aria-label="Visualizar relatório na página">👁️ Ver Relatório</button>
+    </div>
+
+    <!-- Scripts externos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script defer src="script.js"></script>
+  </body>
+</html>
