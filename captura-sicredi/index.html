@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sicredi Report Dashboard</title>
+    <style>
+      /* Reset e base */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Arial, sans-serif;
+        background: linear-gradient(135deg, #f0f9f4 0%, #ffffff 100%);
+        color: #1f2937;
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      /* Header */
+      .header {
+        background: linear-gradient(135deg, #00a651 0%, #28a745 100%);
+        color: #fff;
+        padding: 2rem 0;
+        box-shadow: 0 4px 20px rgba(0, 166, 81, 0.15);
+        position: relative;
+        overflow: hidden;
+      }
+      .header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 40%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.06);
+        transform: rotate(12deg);
+      }
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        position: relative;
+        z-index: 2;
+      }
+      .header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-align: center;
+      }
+      .header-subtitle {
+        text-align: center;
+        opacity: 0.9;
+        font-size: 1.1rem;
+      }
+
+      /* Help button */
+      .help-btn {
+        position: fixed;
+        top: 1.5rem;
+        right: 1.5rem;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.9);
+        color: #00a651;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+      }
+      .help-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Container */
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+      }
+      .main-grid {
+        display: grid;
+        grid-template-columns: 400px 1fr;
+        gap: 2rem;
+        align-items: start;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 1px solid rgba(0, 166, 81, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: 0.3s;
+      }
+      .card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      }
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #00a651;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .template-controls {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .template-btn {
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.4rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+      .template-btn:hover {
+        background: #e5e7eb;
+      }
+      .editor {
+        width: 100%;
+        min-height: 100px;
+        padding: 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        background: #fafafa;
+        font-size: 0.95rem;
+        resize: vertical;
+        outline: none;
+        transition: 0.2s;
+      }
+      .editor:focus {
+        border-color: #00a651;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
+      }
+      .editor:empty::before {
+        content: "Digite aqui...";
+        color: #9ca3af;
+        font-style: italic;
+      }
+
+      /* Report area */
+      .report-area {
+        background: #fff;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 166, 81, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      .report-header {
+        background: linear-gradient(135deg, #00a651 0%, #28a745 100%);
+        color: #fff;
+        padding: 1.5rem;
+      }
+      .report-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .nav-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+      .nav-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .nav-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        color: #fff;
+        cursor: pointer;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .nav-btn:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      .nav-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .page-counter {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+      }
+
+      .page-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(10px);
+      }
+      .page-title {
+        font-weight: 600;
+        color: #fff;
+        cursor: pointer;
+        padding: 0.3rem 0.6rem;
+        border-radius: 8px;
+        transition: 0.2s;
+      }
+      .page-title:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .page-title.editing {
+        background: #fff;
+        color: #00a651;
+        outline: none;
+      }
+      .page-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .btn-sm {
+        background: rgba(255, 255, 255, 0.9);
+        color: #00a651;
+        border: none;
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+        backdrop-filter: blur(10px);
+      }
+      .btn-sm:hover {
+        background: #fff;
+        transform: translateY(-1px);
+      }
+      .btn-sm.danger {
+        background: #dc3545;
+        color: #fff;
+      }
+      .btn-sm.add {
+        background: #28a745;
+        color: #fff;
+      }
+      .btn-sm.success {
+        background-color: #28a745;
+        color: #fff;
+      }
+      .status-select {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        color: #00a651;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      /* Iframe */
+      .iframe-container {
+        position: relative;
+        background: #f8f9fa;
+        min-height: 500px;
+      }
+      .iframe-skeleton {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          45deg,
+          transparent,
+          rgba(0, 166, 81, 0.05),
+          transparent
+        );
+        color: #6b7280;
+        font-weight: 500;
+        z-index: 2;
+      }
+      #reportFrame {
+        width: 100%;
+        height: 1500px;
+        border: 0;
+        display: block;
+      }
+
+      /* Comentários */
+      .comments-section {
+        padding: 1.5rem;
+        background: #fafafa;
+        border-top: 1px solid rgba(0, 166, 81, 0.1);
+      }
+      .comments-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .comments-title {
+        font-weight: 600;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .comments-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .comment-form {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+      }
+      .comment-form input,
+      .comment-form select,
+      .comment-form textarea {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-family: inherit;
+        font-size: 0.9rem;
+        transition: 0.2s;
+      }
+      .comment-form textarea {
+        grid-column: 1 / -1;
+        min-height: 80px;
+        resize: vertical;
+      }
+      .comment-form input:focus,
+      .comment-form select:focus,
+      .comment-form textarea:focus {
+        outline: none;
+        border-color: #00a651;
+        box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
+      }
+      .comment-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .comment-item {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        transition: 0.2s;
+      }
+      .comment-item:hover {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+      .comment-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+      .comment-tag {
+        background: #e0f2e7;
+        color: #00a651;
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+      .comment-info {
+        color: #6b7280;
+        font-size: 0.8rem;
+      }
+      .comment-text {
+        color: #374151;
+        white-space: pre-wrap;
+        margin-bottom: 0.5rem;
+      }
+      .comment-actions {
+        text-align: right;
+      }
+      .btn-tiny {
+        background: #f3f4f6;
+        border: none;
+        border-radius: 6px;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+        color: #6b7280;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .btn-tiny:hover {
+        background: #e5e7eb;
+      }
+
+      /* ⭐ NOVO ESTILO PARA A LISTA DE DASHBOARDS */
+      .dashboard-btn {
+        display: block;
+        width: 100%;
+        padding: 0.8rem 1rem;
+        margin-bottom: 0.5rem;
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        text-align: left;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #1f2937;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .dashboard-btn:hover {
+        background: #e5e7eb;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+      .dashboard-btn.active {
+        background: #e0f2e7;
+        border-color: #00a651;
+        color: #00a651;
+        font-weight: 600;
+      }
+
+      /* PDF Controls */
+      .pdf-controls {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin: 2rem 0;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #00a651 0%, #28a745 100%);
+        color: #fff;
+        border: none;
+        border-radius: 25px;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(0, 166, 81, 0.25);
+        transition: 0.3s;
+        font-size: 1rem;
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 166, 81, 0.35);
+      }
+      .btn-secondary {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        color: #fff;
+        border: none;
+        border-radius: 25px;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(23, 162, 184, 0.25);
+        transition: 0.3s;
+        font-size: 1rem;
+      }
+      .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(23, 162, 184, 0.35);
+      }
+
+      /* Modais */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        backdrop-filter: blur(5px);
+      }
+      .modal-overlay.show {
+        opacity: 1;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 20px;
+        padding: 2rem;
+        width: 92%;
+        max-width: 560px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+      }
+      .modal-overlay.show .modal {
+        transform: scale(1);
+      }
+      .modal h3 {
+        color: #00a651;
+        margin-bottom: 1rem;
+        text-align: center;
+        font-size: 1.4rem;
+      }
+      .modal-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+      }
+      .modal-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 20px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .modal-btn.primary {
+        background: #00a651;
+        color: #fff;
+      }
+      .modal-btn.secondary {
+        background: #6c757d;
+        color: #fff;
+      }
+      .modal-btn.remove-btn {
+        background: #dc3545;
+        color: #fff;
+      }
+      .modal input,
+      .modal textarea {
+        width: 100%;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 0.75rem;
+        margin: 0.5rem 0;
+        font-family: inherit;
+      }
+      .modal input:focus,
+      .modal textarea:focus {
+        outline: none;
+        border-color: #00a651;
+        box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
+      }
+
+      /* Notificações */
+      .notification {
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        background: #00a651;
+        color: #fff;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        transform: translateX(110%);
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 10002;
+        backdrop-filter: blur(10px);
+      }
+      .notification.show {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      .notification.success {
+        background: #28a745;
+      }
+      .notification.error {
+        background: #dc3545;
+      }
+      .notification.info {
+        background: #17a2b8;
+      }
+      .notification.warning {
+        background: #ffc107;
+        color: #2c3e50;
+      }
+
+      /* Responsivo */
+      @media (max-width: 1024px) {
+        .main-grid {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+        .header h1 {
+          font-size: 2rem;
+        }
+        .container {
+          padding: 1rem;
+        }
+      }
+      @media (max-width: 768px) {
+        .page-toolbar {
+          flex-direction: column;
+          gap: 1rem;
+          align-items: stretch;
+        }
+        .page-actions {
+          justify-content: center;
+        }
+        .comment-form {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button
+      class="help-btn"
+      onclick="showHelpModal()"
+      title="Ajuda"
+      aria-label="Abrir ajuda"
+    >
+      ?
+    </button>
+
+    <header class="header">
+      <div class="header-content">
+        <h1>Sicredi Report Dashboard</h1>
+        <p class="header-subtitle">
+          Sistema de análise e validação de relatórios
+        </p>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="main-grid">
+        <div class="sidebar">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><span>📂</span> Dashboards</h3>
+            </div>
+            <div id="dashboard-list"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><span>📊</span> Análise</h3>
+              <div class="template-controls">
+                <button
+                  class="template-btn"
+                  onclick="saveTemplate('analise')"
+                  title="Salvar template"
+                >
+                  💾
+                </button>
+                <button
+                  class="template-btn"
+                  onclick="loadTemplate('analise')"
+                  title="Carregar template"
+                >
+                  📁
+                </button>
+              </div>
+            </div>
+            <div
+              class="editor"
+              contenteditable="true"
+              id="analise"
+              aria-label="Campo de análise"
+            ></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><span>⚠️</span> Pontos Críticos</h3>
+              <div class="template-controls">
+                <button
+                  class="template-btn"
+                  onclick="saveTemplate('criticos')"
+                  title="Salvar template"
+                >
+                  💾
+                </button>
+                <button
+                  class="template-btn"
+                  onclick="loadTemplate('criticos')"
+                  title="Carregar template"
+                >
+                  📁
+                </button>
+              </div>
+            </div>
+            <div
+              class="editor"
+              contenteditable="true"
+              id="criticos"
+              aria-label="Campo de pontos críticos"
+            ></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><span>📝</span> Resumo Executivo</h3>
+              <div class="template-controls">
+                <button
+                  class="template-btn"
+                  onclick="saveTemplate('resumo')"
+                  title="Salvar template"
+                >
+                  💾
+                </button>
+                <button
+                  class="template-btn"
+                  onclick="loadTemplate('resumo')"
+                  title="Carregar template"
+                >
+                  📁
+                </button>
+              </div>
+            </div>
+            <div
+              class="editor"
+              contenteditable="true"
+              id="resumo"
+              aria-label="Campo de resumo executivo"
+            ></div>
+          </div>
+        </div>
+
+        <div class="report-area">
+          <div class="report-header">
+            <div class="report-nav">
+              <h3 class="nav-title">📋 Páginas do Relatório</h3>
+              <div class="nav-controls">
+                <button
+                  class="nav-btn"
+                  onclick="prevPage()"
+                  aria-label="Página anterior"
+                >
+                  ❮
+                </button>
+                <span class="page-counter"
+                  ><span id="currentIndex">1</span> /
+                  <span id="totalPages">1</span></span
+                >
+                <button
+                  class="nav-btn"
+                  onclick="nextPage()"
+                  aria-label="Próxima página"
+                >
+                  ❯
+                </button>
+              </div>
+            </div>
+
+            <div class="page-toolbar">
+              <div
+                class="page-title"
+                id="pageTitle"
+                onclick="editPageTitle(this)"
+                title="Clique para editar o título"
+                tabindex="0"
+              >
+                Página inicial
+              </div>
+
+              <div class="page-actions">
+                <select
+                  id="pageStatus"
+                  class="status-select"
+                  onchange="savePageStatus()"
+                >
+                  <option value="validado">✅ Validado</option>
+                  <option value="ressalva">⚠️ Com ressalva</option>
+                  <option value="pendente">⏳ Pendente</option>
+                </select>
+                <button
+                  class="btn-sm"
+                  onclick="openCurrentInNewTab()"
+                  title="Abrir no Looker em nova guia"
+                >
+                  🔗 Abrir
+                </button>
+                <button
+                  class="btn-sm"
+                  onclick="copyCurrentLink()"
+                  title="Copiar link da página"
+                >
+                  📋 Copiar link
+                </button>
+                <button
+                  class="btn-sm add"
+                  onclick="showAddPageModal()"
+                  title="Adicionar página"
+                >
+                  ➕ Adicionar
+                </button>
+                <button
+                  id="removePageBtn"
+                  class="btn-sm danger"
+                  onclick="confirmRemovePage()"
+                  title="Remover página"
+                  style="display: none"
+                >
+                  🗑️ Remover
+                </button>
+                <button
+                  id="captureBtn"
+                  class="btn-sm"
+                  onclick="captureCurrentPageImage()"
+                  title="Capturar imagem desta página"
+                >
+                  📸 Capturar imagem
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="iframe-container">
+            <div class="iframe-skeleton" id="iframeSkeleton">
+              🔄 Carregando página segura...
+            </div>
+            <iframe
+              id="reportFrame"
+              title="Página do relatório Sicredi"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen
+              sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+            ></iframe>
+          </div>
+
+          <div class="comments-section">
+            <div class="comments-header">
+              <h4 class="comments-title">
+                <span>💬</span> Comentários desta página
+              </h4>
+              <div class="comments-actions">
+                <button class="btn-sm" onclick="exportCommentsCSV()">
+                  ⬇️ Exportar CSV
+                </button>
+                <button class="btn-sm" onclick="clearComments()">
+                  🧹 Limpar todos
+                </button>
+              </div>
+            </div>
+
+            <div class="comment-form">
+              <input
+                id="commentAuthor"
+                type="text"
+                placeholder="Seu nome (opcional)"
+              />
+              <select id="commentTag">
+                <option value="obs">💭 Observação</option>
+                <option value="risco">⚠️ Risco</option>
+                <option value="dado">📊 Dado</option>
+                <option value="pergunta">❓ Pergunta</option>
+              </select>
+              <textarea
+                id="commentText"
+                rows="3"
+                placeholder="Escreva um comentário sobre esta página..."
+              ></textarea>
+              <button class="btn-primary" onclick="addComment()">
+                💬 Adicionar
+              </button>
+            </div>
+
+            <ul id="commentList" class="comment-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="saida"
+        class="report-preview"
+        role="region"
+        aria-label="Visualização do relatório"
+      ></div>
+
+      <div class="pdf-controls">
+        <button
+          class="btn-primary"
+          onclick="showPDFOptions()"
+          aria-label="Configurar e baixar relatório em PDF"
+        >
+          📄 Baixar PDF
+        </button>
+        <button
+          class="btn-secondary"
+          onclick="scrollToReport()"
+          aria-label="Visualizar relatório na página"
+        >
+          👁️ Ver Relatório
+        </button>
+      </div>
+    </div>
+
+    <div id="modalRoot"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+      // ===== Config =====
+      const CONFIG = {
+        STORAGE_KEYS: {
+          PAGES: "sicredi_pages_v2",
+          COMMENTS: "sicredi_comments_v2",
+          STATUS: "sicredi_status_v2",
+          SHOTS: "sicredi_shots_v1",
+          AUTO_SAVE: "sicredi_report_v3_",
+          TEMPLATES: "sicredi_templates_v3",
+        },
+        PDF: {
+          MARGINS: 12,
+          DEFAULT_FILENAME: "relatorio-sicredi",
+          QUALITY: 0.95,
+        },
+        DEBOUNCE_DELAY: 300,
+        AUTOSAVE_DELAY: 2000,
+      };
+
+      const CAPTURE_ENDPOINT = "http://localhost:3001/capture";
+
+      // ===== Estado =====
+      let pages = [];
+      let currentIndex = 0;
+
+      // ===== Boot =====
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Carrega a lista de dashboards do arquivo pages-config.json
+        // Este será sempre o nosso ponto de partida para a lista de páginas
+        let fetchedPages;
+        try {
+          const response = await fetch("./pages-config.json");
+          fetchedPages = await response.json();
+        } catch (err) {
+          console.error("Falha ao carregar pages-config.json:", err);
+          // Fallback para uma página padrão em caso de erro
+          fetchedPages = [
+            {
+              title: "Página inicial padrão",
+              src: "about:blank",
+              width: "600",
+              height: "1000",
+            },
+          ];
+        }
+
+        // Inicializa 'pages' com a lista do arquivo.
+        pages = fetchedPages;
+
+        setupAutoSave();
+        setupKeyboardNavigation();
+
+        // Agora que 'pages' está garantido de ter conteúdo, podemos renderizar
+        renderCurrentPage(0);
+        renderDashboardList();
+        refreshHeaderInfo();
+        updateRemoveButton();
+        atualizarSaida();
+
+        const frame = document.getElementById("reportFrame");
+        frame.addEventListener("load", () => {
+          document.getElementById("iframeSkeleton").style.display = "none";
+        });
+      });
+
+      // ===== Persistência =====
+      function loadPages() {
+        try {
+          return JSON.parse(
+            localStorage.getItem(CONFIG.STORAGE_KEYS.PAGES) || "[]"
+          );
+        } catch {
+          return [];
+        }
+      }
+      function persistPages() {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.PAGES, JSON.stringify(pages));
+      }
+
+      // ===== Screenshots cache =====
+      function loadShots() {
+        try {
+          return JSON.parse(
+            localStorage.getItem(CONFIG.STORAGE_KEYS.SHOTS) || "{}"
+          );
+        } catch {
+          return {};
+        }
+      }
+      function saveShots(map) {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.SHOTS, JSON.stringify(map));
+      }
+      function getShotForPage(p) {
+        const map = loadShots();
+        return map[pageKey(p)] || null;
+      }
+      function setShotForPage(p, dataUrl) {
+        const map = loadShots();
+        map[pageKey(p)] = dataUrl;
+        saveShots(map);
+      }
+
+      // ===== Navegação =====
+      function prevPage() {
+        let newIndex = currentIndex - 1;
+        if (newIndex >= 0) {
+          selectPage(newIndex);
+        }
+      }
+
+      function nextPage() {
+        let newIndex = currentIndex + 1;
+        if (newIndex < pages.length) {
+          selectPage(newIndex);
+        }
+      }
+
+      // ===== Helpers =====
+      function pageKey(page) {
+        return page?.src || `page_${currentIndex}`;
+      }
+
+      // ===== Render página atual =====
+      function renderCurrentPage() {
+        const frame = document.getElementById("reportFrame");
+        const skeleton = document.getElementById("iframeSkeleton");
+        skeleton.style.display = "flex";
+
+        const page = pages[currentIndex];
+        if (!page) return;
+
+        frame.src = page.src;
+        frame.style.height = `${page.height || 1550}px`;
+
+        document.getElementById("pageTitle").textContent =
+          page.title || "Sem título";
+        document.getElementById("currentIndex").textContent = pages.length
+          ? currentIndex + 1
+          : 0;
+        document.getElementById("totalPages").textContent = pages.length;
+
+        const statusMap = loadStatuses();
+        document.getElementById("pageStatus").value =
+          statusMap[pageKey(page)] || "pendente";
+
+        renderComments();
+        atualizarSaida();
+        updateCaptureButtonState();
+        updateDashboardListActiveState();
+      }
+
+      // ⭐ NOVAS FUNÇÕES PARA GESTÃO DE DASHBOARDS
+      function renderDashboardList() {
+        const listContainer = document.getElementById("dashboard-list");
+        if (!listContainer) return;
+        listContainer.innerHTML = pages
+          .map(
+            (p, i) => `
+        <button class="dashboard-btn" onclick="selectPage(${i})">
+            ${p.title}
+        </button>
+    `
+          )
+          .join("");
+        updateDashboardListActiveState();
+      }
+
+      function selectPage(index) {
+        currentIndex = index;
+        renderCurrentPage();
+        refreshHeaderInfo();
+      }
+
+      function updateDashboardListActiveState() {
+        document.querySelectorAll(".dashboard-btn").forEach((btn, index) => {
+          if (index === currentIndex) {
+            btn.classList.add("active");
+          } else {
+            btn.classList.remove("active");
+          }
+        });
+      }
+
+      function refreshHeaderInfo() {
+        const prevBtn = document.querySelector(
+          ".nav-controls .nav-btn:first-child"
+        );
+        const nextBtn = document.querySelector(
+          ".nav-controls .nav-btn:last-child"
+        );
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex >= pages.length - 1;
+      }
+      function updateRemoveButton() {
+        document.getElementById("removePageBtn").style.display =
+          pages.length > 1 ? "inline-flex" : "none";
+      }
+
+      // ⭐ NOVA FUNÇÃO PARA ATUALIZAR O BOTÃO DE CAPTURA
+      function updateCaptureButtonState() {
+        const page = pages[currentIndex];
+        if (!page) return;
+
+        const captureButton = document.getElementById("captureBtn");
+        const hasShot = !!getShotForPage(page);
+
+        if (hasShot) {
+          captureButton.innerHTML = "🖼️ Imagem Salva";
+          captureButton.classList.add("success");
+          captureButton.title =
+            "A imagem desta página já foi capturada. Clique para capturar novamente.";
+        } else {
+          captureButton.innerHTML = "📸 Capturar imagem";
+          captureButton.classList.remove("success");
+          captureButton.title = "Capturar imagem desta página";
+        }
+      }
+
+      // ===== Editar título =====
+      function editPageTitle(el) {
+        if (el.isContentEditable) return;
+        const original = el.textContent;
+        el.contentEditable = true;
+        el.classList.add("editing");
+        el.focus();
+
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+
+        const finish = (commit = true) => {
+          el.classList.remove("editing");
+          el.contentEditable = false;
+          const newTitle = el.textContent.trim();
+          if (commit && newTitle && pages[currentIndex]) {
+            pages[currentIndex].title = newTitle;
+            persistPages();
+            atualizarSaida();
+            toast("✅ Título atualizado!", "success");
+          } else {
+            el.textContent = original;
+          }
+        };
+        el.addEventListener("blur", () => finish(true), { once: true });
+        el.addEventListener(
+          "keydown",
+          (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              finish(true);
+            }
+            if (e.key === "Escape") {
+              e.preventDefault();
+              finish(false);
+            }
+          },
+          { once: true }
+        );
+      }
+
+      // ===== Adicionar / Remover páginas =====
+      function showAddPageModal() {
+        document.getElementById("modalRoot").innerHTML = `
+        <div class="modal-overlay show">
+          <div class="modal">
+            <h3>➕ Adicionar Nova Página</h3>
+            <p>Cole a <strong>URL de incorporação</strong> do Looker Studio ou o snippet completo &lt;iframe …&gt;.</p>
+            <input id="newPageTitle" placeholder="Título da página" style="margin-bottom:10px">
+            <textarea id="newPageSrc" rows="4" placeholder="URL ou &lt;iframe src='…'&gt;"></textarea>
+            <div class="modal-buttons">
+              <button class="modal-btn secondary" onclick="closeModal()">Cancelar</button>
+              <button class="modal-btn primary" onclick="addPageFromModal()">Adicionar</button>
+            </div>
+          </div>
+        </div>`;
+      }
+      function closeModal() {
+        document.getElementById("modalRoot").innerHTML = "";
+      }
+
+      function extractSrcFromInput(text) {
+        const trimmed = (text || "").trim();
+        if (!trimmed) return "";
+        const m = trimmed.match(/src=["']([^"']+)["']/i);
+        if (m && m[1]) return m[1];
+        if (/^https?:\/\//i.test(trimmed)) return trimmed;
+        return "";
+      }
+      function addPageFromModal() {
+        const title =
+          document.getElementById("newPageTitle").value.trim() ||
+          `Página ${pages.length + 1}`;
+        const raw = document.getElementById("newPageSrc").value.trim();
+        const src = extractSrcFromInput(raw);
+        if (!src) {
+          toast("⚠️ Informe uma URL válida ou um iframe com src.", "warning");
+          return;
+        }
+        pages.push({ title, src });
+        persistPages();
+        closeModal();
+        currentIndex = pages.length - 1;
+        renderCurrentPage();
+        refreshHeaderInfo();
+        updateRemoveButton();
+        toast("✅ Página adicionada!", "success");
+      }
+
+      function confirmRemovePage() {
+        const page = pages[currentIndex];
+        document.getElementById("modalRoot").innerHTML = `
+        <div class="modal-overlay show">
+          <div class="modal">
+            <h3>🗑️ Remover Página</h3>
+            <p>Tem certeza que deseja remover <strong>${
+              page?.title || "esta página"
+            }</strong>?</p>
+            <p style="color:#dc3545;font-size:.9rem; margin-top:1rem;">Esta ação não pode ser desfeita.</p>
+            <div class="modal-buttons">
+              <button class="modal-btn secondary" onclick="closeModal()">Cancelar</button>
+              <button class="modal-btn remove-btn" onclick="removeCurrentPage()">Remover</button>
+            </div>
+          </div>
+        </div>`;
+      }
+      function removeCurrentPage() {
+        closeModal();
+        if (pages.length <= 1) {
+          toast("ℹ️ Deixe ao menos uma página.", "info");
+          return;
+        }
+        const removed = pages.splice(currentIndex, 1)[0];
+        persistPages();
+        if (currentIndex >= pages.length) currentIndex = pages.length - 1;
+        renderCurrentPage();
+        refreshHeaderInfo();
+        updateRemoveButton();
+        toast(`🗑️ Página "${removed?.title}" removida.`, "success");
+      }
+
+      // ===== Status por página =====
+      function loadStatuses() {
+        try {
+          return JSON.parse(
+            localStorage.getItem(CONFIG.STORAGE_KEYS.STATUS) || "{}"
+          );
+        } catch {
+          return {};
+        }
+      }
+      function saveStatuses(map) {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.STATUS, JSON.stringify(map));
+      }
+      function savePageStatus() {
+        const map = loadStatuses();
+        map[pageKey(pages[currentIndex])] =
+          document.getElementById("pageStatus").value;
+        saveStatuses(map);
+        atualizarSaida();
+      }
+
+      // ===== Ações da página =====
+      function openCurrentInNewTab() {
+        const p = pages[currentIndex];
+        if (p?.src) window.open(p.src, "_blank", "noopener");
+      }
+      function copyCurrentLink() {
+        const p = pages[currentIndex];
+        if (!p?.src) return;
+        navigator.clipboard
+          .writeText(p.src)
+          .then(() => toast("🔗 Link copiado!", "success"));
+      }
+
+      // ===== Comentários =====
+      function getCommentsMap() {
+        try {
+          return JSON.parse(
+            localStorage.getItem(CONFIG.STORAGE_KEYS.COMMENTS) || "{}"
+          );
+        } catch {
+          return {};
+        }
+      }
+      function saveCommentsMap(map) {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.COMMENTS, JSON.stringify(map));
+      }
+      function currentComments() {
+        const map = getCommentsMap();
+        return map[pageKey(pages[currentIndex])] || [];
+      }
+
+      function renderComments() {
+        const list = document.getElementById("commentList");
+        list.innerHTML = "";
+        currentComments().forEach((c, idx) => {
+          const li = document.createElement("li");
+          li.className = "comment-item";
+          li.innerHTML = `
+          <div class="comment-meta">
+            <span class="comment-tag">${c.tag}</span>
+            <span class="comment-info">${
+              c.author ? c.author + " • " : ""
+            }${new Date(c.createdAt).toLocaleString("pt-BR")}</span>
+          </div>
+          <div class="comment-text">${escapeHTML(c.text).replace(
+            /\n/g,
+            "<br>"
+          )}</div>
+          <div class="comment-actions"><button class="btn-tiny" onclick="deleteComment(${idx})">Remover</button></div>`;
+          list.appendChild(li);
+        });
+      }
+      function addComment() {
+        const author = document.getElementById("commentAuthor").value.trim();
+        const tag = document.getElementById("commentTag").value;
+        const text = document.getElementById("commentText").value.trim();
+        if (!text) {
+          toast("⚠️ Escreva um comentário.", "warning");
+          return;
+        }
+        const map = getCommentsMap();
+        const key = pageKey(pages[currentIndex]);
+        map[key] = map[key] || [];
+        map[key].push({
+          author,
+          tag,
+          text,
+          createdAt: new Date().toISOString(),
+        });
+        saveCommentsMap(map);
+        document.getElementById("commentText").value = "";
+        renderComments();
+        atualizarSaida();
+        toast("💬 Comentário adicionado!", "success");
+      }
+      function deleteComment(index) {
+        const map = getCommentsMap();
+        const key = pageKey(pages[currentIndex]);
+        (map[key] || []).splice(index, 1);
+        saveCommentsMap(map);
+        renderComments();
+        atualizarSaida();
+      }
+      function clearComments() {
+        const key = pageKey(pages[currentIndex]);
+        const map = getCommentsMap();
+        map[key] = [];
+        saveCommentsMap(map);
+        renderComments();
+        atualizarSaida();
+        toast("🧹 Comentários limpos!", "success");
+      }
+      function exportCommentsCSV() {
+        const rows = [];
+        pages.forEach((p, i) => {
+          const key = pageKey(p);
+          const list = getCommentsMap()[key] || [];
+          const status = loadStatuses()[key] || "pendente";
+          if (!list.length) {
+            rows.push([i + 1, p.title, status, "", "", ""]);
+          } else {
+            list.forEach((c) =>
+              rows.push([
+                i + 1,
+                p.title,
+                status,
+                c.tag,
+                c.author || "",
+                c.text.replace(/\n/g, " "),
+              ])
+            );
+          }
+        });
+        const csv = ["Indice,Título,Status,Tag,Autor,Comentário"]
+          .concat(
+            rows.map((r) =>
+              r.map((s) => `"${String(s || "").replace(/"/g, '""')}"`).join(",")
+            )
+          )
+          .join("\n");
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `comentarios-sicredi-${new Date()
+          .toISOString()
+          .slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+
+      // ===== Autosave / Templates =====
+      function setupAutoSave() {
+        document.querySelectorAll(".editor").forEach((ed) => {
+          const saved = localStorage.getItem(
+            CONFIG.STORAGE_KEYS.AUTO_SAVE + ed.id
+          );
+          if (saved) ed.innerText = saved;
+          ed.addEventListener(
+            "input",
+            debounce(() => {
+              localStorage.setItem(
+                CONFIG.STORAGE_KEYS.AUTO_SAVE + ed.id,
+                ed.innerText
+              );
+              toast("💾 Conteúdo salvo!", "info", 1800);
+              atualizarSaida();
+            }, CONFIG.AUTOSAVE_DELAY)
+          );
+        });
+      }
+      function saveTemplate(fieldId) {
+        const content = document.getElementById(fieldId).innerText.trim();
+        if (!content) return toast("⚠️ Campo vazio.", "warning");
+        const name = prompt(
+          "Nome do template:",
+          `${fieldId}_${new Date().toISOString().slice(0, 10)}`
+        );
+        if (!name) return;
+        const all = getTemplates();
+        all[name] = { fieldId, content, created: new Date().toISOString() };
+        localStorage.setItem(
+          CONFIG.STORAGE_KEYS.TEMPLATES,
+          JSON.stringify(all)
+        );
+        toast(`💾 Template "${name}" salvo!`, "success");
+      }
+      function loadTemplate(fieldId) {
+        const all = getTemplates();
+        const names = Object.keys(all).filter(
+          (n) => all[n].fieldId === fieldId
+        );
+        if (!names.length)
+          return toast("ℹ️ Nenhum template para este campo.", "info");
+        const list = names.map((n) => `• ${n}`).join("\n");
+        const pick = prompt(
+          `Templates disponíveis:\n${list}\n\nDigite o nome:`
+        );
+        if (pick && all[pick]) {
+          document.getElementById(fieldId).innerText = all[pick].content;
+          atualizarSaida();
+          toast(`📁 Template "${pick}" carregado!`, "success");
+        }
+      }
+      function getTemplates() {
+        try {
+          return JSON.parse(
+            localStorage.getItem(CONFIG.STORAGE_KEYS.TEMPLATES) || "{}"
+          );
+        } catch {
+          return {};
+        }
+      }
+
+      // ===== Puppeteer: captura da imagem =====
+      async function captureCurrentPageImage() {
+        const p = pages[currentIndex];
+        if (!p?.src) return;
+        const captureButton = document.getElementById("captureBtn");
+        captureButton.disabled = true;
+        captureButton.innerHTML = "🔄 Capturando...";
+
+        try {
+          // ⭐ AJUSTE: ENVIAR W E H DINAMICAMENTE
+          const url = `${CAPTURE_ENDPOINT}?url=${encodeURIComponent(p.src)}&w=${
+            p.width || 650
+          }&h=${p.height || 1350}`;
+          const res = await fetch(url, { method: "GET" });
+
+          if (!res.ok) {
+            // Checa se a resposta foi um erro (4xx ou 5xx)
+            throw new Error(`Servidor respondeu com status ${res.status}`);
+          }
+
+          const json = await res.json();
+          if (!json.ok || !json.dataUrl) {
+            throw new Error(json.error || "Resposta do servidor inválida");
+          }
+
+          setShotForPage(p, json.dataUrl);
+          atualizarSaida();
+          toast("✅ Imagem salva para esta página!", "success");
+        } catch (err) {
+          console.error("Erro na captura:", err);
+          toast(
+            "❌ Falha ao capturar. Verifique o console do servidor.",
+            "error"
+          );
+        } finally {
+          captureButton.disabled = false;
+          updateCaptureButtonState(); // ⭐ CHAMADA DA NOVA FUNÇÃO (também no sucesso)
+        }
+      }
+      function blobToDataURL(blob) {
+        return new Promise((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result);
+          r.onerror = reject;
+          r.readAsDataURL(blob);
+        });
+      }
+
+      // ===== PDF =====
+      function showPDFOptions() {
+        const shotExists = !!getShotForPage(pages[currentIndex]);
+        document.getElementById("modalRoot").innerHTML = `
+        <div class="modal-overlay show">
+          <div class="modal">
+            <h3>📄 Opções de PDF</h3>
+            <p>O PDF inclui suas análises, o índice de páginas (com links), status e comentários.</p>
+            <input id="pdfFilename" value="relatorio-sicredi-${new Date()
+              .toISOString()
+              .slice(0, 10)}">
+            <label style="display:flex;align-items:center;gap:.5rem;margin-top:1rem;">
+              <input id="highQuality" type="checkbox" checked> Alta qualidade
+            </label>
+            <div style="margin-top:10px;display:grid;gap:8px;">
+              <label style="display:flex;align-items:center;gap:.5rem;">
+                <input id="includeShotCurrent" type="checkbox" ${
+                  shotExists ? "checked" : ""
+                }>
+                Incluir imagem da <strong>página atual</strong> (se capturada)
+              </label>
+              <label style="display:flex;align-items:center;gap:.5rem;">
+                <input id="includeShotAll" type="checkbox">
+                Incluir imagens de <strong>todas</strong> as páginas (quando houver)
+              </label>
+            </div>
+            <div style="margin-top:1rem; padding:1rem; background:#fff3cd; border-left:4px solid #ffc107; border-radius:8px; font-size:.9rem;">
+              <strong>⚠️ Nota:</strong> Navegadores não permitem capturar iframes direto no PDF.
+              Use o botão <em>📸 Capturar imagem</em> para salvar a imagem de cada página via seu servidor Puppeteer.
+            </div>
+            <div class="modal-buttons">
+              <button class="modal-btn secondary" onclick="closeModal()">Cancelar</button>
+              <button class="modal-btn primary" onclick="generatePDF()">Gerar PDF</button>
+            </div>
+          </div>
+        </div>`;
+      }
+
+      // Localize e substitua a função generatePDF inteira por esta nova versão:
+      async function generatePDF() {
+        const filename =
+          document.getElementById("pdfFilename").value ||
+          CONFIG.PDF.DEFAULT_FILENAME;
+        const highQuality = document.getElementById("highQuality").checked;
+        const includeShotCurrent =
+          document.getElementById("includeShotCurrent")?.checked;
+        const includeShotAll =
+          document.getElementById("includeShotAll")?.checked;
+        closeModal();
+
+        // Coletamos apenas os dados que serão de fato usados
+        const analise =
+          document.getElementById("analise").innerText.trim() ||
+          "Nenhuma análise informada.";
+        const criticos =
+          document.getElementById("criticos").innerText.trim() ||
+          "Nenhum ponto crítico informado.";
+
+        const temp = document.createElement("div");
+        temp.style.position = "absolute";
+        temp.style.left = "-9999px";
+        temp.style.width = "210mm";
+        temp.style.background = "#fff";
+        temp.style.fontFamily = '"Segoe UI", Arial, sans-serif';
+        temp.style.fontSize = "14px";
+        temp.style.lineHeight = "1.6";
+
+        const pagesHtml = pages
+          .map((p, i) => {
+            const shot =
+              includeShotAll || (includeShotCurrent && i === currentIndex)
+                ? getShotForPage(p) || null
+                : null;
+
+            if ((includeShotAll || includeShotCurrent) && !shot) {
+              return "";
+            }
+
+            const shotHtml = shot
+              ? `<div style="page-break-inside: avoid; margin-bottom: 20px; border:1px solid #e5e7eb; border-radius:10px; overflow:hidden;">
+           <img src="${shot}" alt="Captura da página ${
+                  i + 1
+                }" style="width:100%; height:auto; display:block;">
+         </div>`
+              : "";
+
+            return `
+      ${shotHtml}
+
+      <div style="page-break-inside: avoid;">
+        <div style="padding:15px; background:#f8fffe; border-left:4px solid #00a651; border-radius:8px; margin-bottom:15px;">
+          <h3 style="color:#00a651; margin:0 0 8px 0; font-size:1.1rem;">📊 Análise</h3>
+          <div style="font-size:1rem">${escapeHTML(analise).replace(
+            /\n/g,
+            "<br>"
+          )}</div>
+        </div>
+
+        <div style="padding:15px; background:#fff8f8; border-left:4px solid #dc3545; border-radius:8px; margin-bottom: 25px;">
+          <h3 style="color:#dc3545; margin:0 0 8px 0; font-size:1.1rem;">⚠️ Pontos Críticos</h3>
+          <div style="font-size:1rem">${escapeHTML(criticos).replace(
+            /\n/g,
+            "<br>"
+          )}</div>
+        </div>
+      </div>
+      `;
+          })
+          .join(
+            '<hr style="border:none; height:1px; background-color:#e5e7eb; margin: 0 0 25px 0;">'
+          ); // Divisor entre as páginas
+
+        // ⭐ LAYOUT PRINCIPAL ATUALIZADO: TÍTULO REMOVIDO
+        temp.innerHTML = `
+    <div style="padding: 25px;">
+      ${pagesHtml}
+
+      <div style="margin-top:40px; padding-top:20px; text-align:center; border-top:1px solid #e5e7eb;">
+        <div style="display:flex; align-items:center; justify-content:center; gap:20px;">
+          <img src="https://via.placeholder.com/150x50.png?text=Logo+Suno" alt="Logo Suno" style="height:40px; width:auto;">
+          
+          <img src="https://via.placeholder.com/150x50.png?text=Logo+Sicredi" alt="Logo Sicredi" style="height:40px; width:auto;">
+        </div>
+      </div>
+    </div>`;
+
+        document.body.appendChild(temp);
+        await baixarPDFCustom(temp, filename, highQuality, () =>
+          document.body.removeChild(temp)
+        );
+      }
+
+      async function baixarPDFCustom(element, filename, isHighQuality, cb) {
+        const { jsPDF } = window.jspdf;
+        const scale = isHighQuality
+          ? window.devicePixelRatio * 2
+          : window.devicePixelRatio * 1.2;
+
+        try {
+          const canvas = await html2canvas(element, {
+            backgroundColor: "#fff",
+            scale,
+            useCORS: true,
+          });
+          const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: "a4",
+            compress: true,
+          });
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          const margin = CONFIG.PDF.MARGINS;
+          const contentWidth = pageWidth - margin * 2;
+
+          let yCanvas = 0;
+          let remaining = canvas.height;
+          // Ajuste para dar um pouco mais de espaço no topo
+          const sliceHeightOnCanvas =
+            (pageHeight - margin * 2) * (canvas.width / contentWidth);
+
+          let page = 1;
+          while (remaining > 0) {
+            const h = Math.min(sliceHeightOnCanvas, remaining);
+            const tmp = document.createElement("canvas");
+            tmp.width = canvas.width;
+            tmp.height = h;
+            const tctx = tmp.getContext("2d");
+            tctx.drawImage(
+              canvas,
+              0,
+              yCanvas,
+              canvas.width,
+              h,
+              0,
+              0,
+              canvas.width,
+              h
+            );
+            const sliceImg = tmp.toDataURL("image/png", CONFIG.PDF.QUALITY);
+            const slicePdfHeight = (tmp.height * contentWidth) / tmp.width;
+
+            if (page > 1) pdf.addPage();
+
+            // ⭐ ALTERAÇÃO: Cabeçalho e rodapé removidos
+            // pdf.setFontSize(10); pdf.setTextColor(100);
+            // pdf.text('Relatório Sicredi - Confidencial', margin, 10);
+            // pdf.text(new Date().toLocaleString('pt-BR'), pageWidth - margin, 10, {align:'right'});
+
+            // O conteúdo agora começa mais perto do topo
+            pdf.addImage(
+              sliceImg,
+              "PNG",
+              margin,
+              margin,
+              contentWidth,
+              slicePdfHeight,
+              undefined,
+              "FAST"
+            );
+
+            // pdf.setFontSize(8);
+            // pdf.text(`Página ${page}`, pageWidth/2, pageHeight-5, {align:'center'});
+
+            yCanvas += h;
+            remaining -= h;
+            page++;
+          }
+
+          const ts = new Date()
+            .toISOString()
+            .slice(0, 19)
+            .replace(/[:T]/g, "-");
+          pdf.save(`${filename || CONFIG.PDF.DEFAULT_FILENAME}-${ts}.pdf`);
+          toast("✅ PDF gerado com sucesso!", "success");
+        } catch (err) {
+          console.error(err);
+          toast("❌ Erro ao gerar PDF", "error");
+        } finally {
+          cb && cb();
+        }
+      }
+
+      // ===== Preview textual =====
+      function atualizarSaida() {
+        const analise =
+          document.getElementById("analise").innerText.trim() ||
+          "Nenhuma análise informada.";
+        const criticos =
+          document.getElementById("criticos").innerText.trim() ||
+          "Nenhum ponto crítico informado.";
+        const resumo =
+          document.getElementById("resumo").innerText.trim() ||
+          "Nenhum resumo informado.";
+        const now = new Date().toLocaleString("pt-BR");
+
+        document.getElementById("saida").innerHTML = `
+        <h2>📋 Relatório Sicredi</h2>
+        <div style="text-align:center;margin-bottom:20px;color:#666;font-style:italic">
+          <em>📅 Gerado em ${now}</em>
+        </div>
+
+        <div class="report-section">
+          <h3>📊 Análise</h3>
+          <div>${escapeHTML(analise).replace(/\n/g, "<br>")}</div>
+        </div>
+
+        <hr class="report-divider">
+
+        <div class="report-section">
+          <h3>⚠️ Pontos Críticos</h3>
+          <div>${escapeHTML(criticos).replace(/\n/g, "<br>")}</div>
+        </div>
+
+        <hr class="report-divider">
+
+        <div class="report-section">
+          <h3>📝 Resumo Executivo</h3>
+          <div>${escapeHTML(resumo).replace(/\n/g, "<br>")}</div>
+        </div>
+
+        <hr class="report-divider">
+
+        <div class="report-section">
+          <h3>📑 Páginas Avaliadas</h3>
+          <div style="display:grid;gap:1rem;margin-top:1rem;">
+            ${pages
+              .map((p, i) => {
+                const key = pageKey(p);
+                const status = loadStatuses()[key] || "pendente";
+                const commentsCount = (getCommentsMap()[key] || []).length;
+                const statusIcon =
+                  { validado: "✅", ressalva: "⚠️", pendente: "⏳" }[status] ||
+                  "⏳";
+                const hasShot = !!getShotForPage(p);
+                return `
+                <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1rem;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4px rgba(0,0,0,.05);">
+                  <div>
+                    <h4 style="margin:0;color:#00a651;font-size:1.1rem;">
+                      ${i + 1}. <a href="${
+                  p.src
+                }" target="_blank" rel="noopener" style="color:#00a651;text-decoration:none;">${escapeHTML(
+                  p.title || "Sem título"
+                )}</a>
+                    </h4>
+                    <div style="margin-top:.5rem;font-size:.9rem;color:#6b7280;">
+                      <span>${statusIcon} <strong>Status:</strong> ${status}</span> • 
+                      <span>💬 <strong>${commentsCount}</strong> comentário(s)</span> • 
+                      <span>${
+                        hasShot ? "🖼️ imagem pronta" : "🖼️ sem imagem"
+                      }</span>
+                    </div>
+                  </div>
+                  <a href="${
+                    p.src
+                  }" target="_blank" rel="noopener" style="text-decoration:none;color:#00a651;background:#f0f9f4;padding:.4rem .8rem;border-radius:999px;font-weight:600;">Abrir ↗</a>
+                </div>`;
+              })
+              .join("")}
+          </div>
+        </div>
+
+        <div class="report-foot" style="text-align:center;color:#6b7280;">
+          <small><strong style="color:#00a651">Sicredi</strong> — Sistema de Crédito Cooperativo</small>
+        </div>`;
+      }
+
+      // ===== Utilidades =====
+      function debounce(fn, wait) {
+        let t;
+        return (...a) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...a), wait);
+        };
+      }
+      function escapeHTML(s) {
+        return String(s || "").replace(
+          /[&<>"']/g,
+          (m) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[m])
+        );
+      }
+      function toast(message, type = "info", ms = 2500) {
+        document.querySelector(".notification")?.remove();
+        const n = document.createElement("div");
+        n.className = `notification ${type}`;
+        n.textContent = message;
+        document.body.appendChild(n);
+        setTimeout(() => n.classList.add("show"), 10);
+        setTimeout(() => {
+          n.classList.remove("show");
+          setTimeout(() => n.remove(), 300);
+        }, ms);
+      }
+      function scrollToReport() {
+        document
+          .getElementById("saida")
+          ?.scrollIntoView({ behavior: "smooth" });
+      }
+      function setupKeyboardNavigation() {
+        document.addEventListener("keydown", (e) => {
+          if (e.ctrlKey || e.metaKey) {
+            if (e.key === "s") {
+              e.preventDefault();
+              showPDFOptions();
+            }
+            if (e.key === "r") {
+              e.preventDefault();
+              scrollToReport();
+            }
+          }
+          if (e.key === "ArrowLeft") prevPage();
+          if (e.key === "ArrowRight") nextPage();
+        });
+      }
+
+      // ===== Ajuda =====
+      function showHelpModal() {
+        document.getElementById("modalRoot").innerHTML = `
+        <div class="modal-overlay show">
+          <div class="modal">
+            <h3>📚 Como usar</h3>
+            <p>• Adicione páginas com a URL de incorporação do Looker Studio (acesso restrito por login).<br>
+               • Cada página tem <strong>Status</strong> e <strong>Comentários</strong> próprios.<br>
+               • Use os campos à esquerda para <strong>Análise</strong>, <strong>Pontos Críticos</strong> e <strong>Resumo</strong> (com autosave e templates).<br>
+               • Para incluir os dashboards no PDF, clique em <strong>📸 Capturar imagem</strong> em cada página (usa o servidor Puppeteer).<br>
+               • Depois gere o PDF e marque as opções de imagens.</p>
+            <div class="modal-buttons">
+              <button class="modal-btn primary" onclick="closeModal()">Entendi! 👍</button>
+            </div>
+          </div>
+        </div>`;
+      }
+    </script>
+  </body>
+</html>
